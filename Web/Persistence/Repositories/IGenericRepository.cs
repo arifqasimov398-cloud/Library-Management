@@ -7,6 +7,6 @@
         T? GetById(Guid id); 
         void Delete(T entity);
         void Update(T entity);
-
+            
     }
 }

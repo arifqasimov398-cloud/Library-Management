@@ -1,13 +1,18 @@
 @Web_HostAddress = http://localhost:5238
+
+### Kateqoriyalar
+
+# @name romanCategory
 POST {{Web_HostAddress}}/api/categories
 Content-Type: application/json
 
 {
-  "name": "Roman"
+  "name": "Roman123"
 }
 
 ###
 
+# @name elmiCategory
 POST {{Web_HostAddress}}/api/categories
 Content-Type: application/json
 
@@ -15,17 +20,14 @@ Content-Type: application/json
   "name": "Elmi"
 }
 
-### 
-
-### 
+###
 
 GET {{Web_HostAddress}}/api/categories
 Accept: application/json
 
-### 
+### Kitablar
 
-### 
-
+# @name aqQala
 POST {{Web_HostAddress}}/api/books
 Content-Type: application/json
 
@@ -33,7 +35,7 @@ Content-Type: application/json
   "title": "Ağ qala",
   "author": "Orxan Pamuk",
   "price": 12.50,
-  "categoryId": "BURA-ROMAN-KATEQORIYASININ-ID-SI"
+  "categoryId": "{{romanCategory.response.body.$.id}}"
 }
 
 ###
@@ -45,7 +47,7 @@ Content-Type: application/json
   "title": "Qara kitab",
   "author": "Orxan Pamuk",
   "price": 15.00,
-  "categoryId": "BURA-ROMAN-KATEQORIYASININ-ID-SI"
+  "categoryId": "{{romanCategory.response.body.$.id}}"
 }
 
 ###
@@ -57,7 +59,7 @@ Content-Type: application/json
   "title": "Qısa zamanın tarixi",
   "author": "Stiven Hokinq",
   "price": 20.00,
-  "categoryId": "BURA-ELMI-KATEQORIYASININ-ID-SI"
+  "categoryId": "{{elmiCategory.response.body.$.id}}"
 }
 
 ###
@@ -69,12 +71,10 @@ Content-Type: application/json
   "title": "Kosmos",
   "author": "Karl Saqan",
   "price": 18.00,
-  "categoryId": "BURA-ELMI-KATEQORIYASININ-ID-SI"
+  "categoryId": "{{elmiCategory.response.body.$.id}}"
 }
 
-### 
-
-### 
+### Oxucular
 
 POST {{Web_HostAddress}}/api/readers
 Content-Type: application/json
@@ -94,9 +94,7 @@ Content-Type: application/json
   "email": "aysel@mail.com"
 }
 
-###
-
-###
+### Siyahılar
 
 GET {{Web_HostAddress}}/api/books
 Accept: application/json
@@ -106,35 +104,28 @@ Accept: application/json
 GET {{Web_HostAddress}}/api/readers
 Accept: application/json
 
-### 
+### Tək kitab, yeniləmə, silmə
 
-### 
-
-GET {{Web_HostAddress}}/api/books/BURA-KITAB-ID-SI
+GET {{Web_HostAddress}}/api/books/{{aqQala.response.body.$.id}}
 Accept: application/json
 
-### 
-### 
+###
 
-PUT {{Web_HostAddress}}/api/books/BURA-KITAB-ID-SI
+PUT {{Web_HostAddress}}/api/books/{{aqQala.response.body.$.id}}
 Content-Type: application/json
 
 {
   "title": "Ağ qala",
   "author": "Orxan Pamuk",
   "price": 25.00,
-  "categoryId": "BURA-ROMAN-KATEQORIYASININ-ID-SI"
+  "categoryId": "{{romanCategory.response.body.$.id}}"
 }
 
-### 
+###
 
-### 
+DELETE {{Web_HostAddress}}/api/books/{{aqQala.response.body.$.id}}
 
-DELETE {{Web_HostAddress}}/api/books/BURA-KITAB-ID-SI
-
-### 
-
-### 
+### Mövcud olmayan kitab (404 gözlənilir)
 
 GET {{Web_HostAddress}}/api/books/00000000-0000-0000-0000-000000000000
 Accept: application/json

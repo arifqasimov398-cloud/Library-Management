@@ -1,4 +1,5 @@
-﻿namespace Web.Application.Conturollers
+﻿
+namespace Web.Application.Conturollers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -10,10 +11,11 @@
             return Ok(context.GetAll());
         }
         [HttpPost]
-        public IActionResult Create(Category category)
-        {       
+        public IActionResult Create(CreateCategoryDto dto)
+        {
+            var category = new Category { Name = dto.Name };
             context.Add(category);
-            return Created(string.Empty,  category);
+            return Ok(category);
         }
     }
 }
