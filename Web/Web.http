@@ -1,0 +1,140 @@
+@Web_HostAddress = http://localhost:5238
+POST {{Web_HostAddress}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "Roman"
+}
+
+###
+
+POST {{Web_HostAddress}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "Elmi"
+}
+
+### 
+
+### 
+
+GET {{Web_HostAddress}}/api/categories
+Accept: application/json
+
+### 
+
+### 
+
+POST {{Web_HostAddress}}/api/books
+Content-Type: application/json
+
+{
+  "title": "Ağ qala",
+  "author": "Orxan Pamuk",
+  "price": 12.50,
+  "categoryId": "BURA-ROMAN-KATEQORIYASININ-ID-SI"
+}
+
+###
+
+POST {{Web_HostAddress}}/api/books
+Content-Type: application/json
+
+{
+  "title": "Qara kitab",
+  "author": "Orxan Pamuk",
+  "price": 15.00,
+  "categoryId": "BURA-ROMAN-KATEQORIYASININ-ID-SI"
+}
+
+###
+
+POST {{Web_HostAddress}}/api/books
+Content-Type: application/json
+
+{
+  "title": "Qısa zamanın tarixi",
+  "author": "Stiven Hokinq",
+  "price": 20.00,
+  "categoryId": "BURA-ELMI-KATEQORIYASININ-ID-SI"
+}
+
+###
+
+POST {{Web_HostAddress}}/api/books
+Content-Type: application/json
+
+{
+  "title": "Kosmos",
+  "author": "Karl Saqan",
+  "price": 18.00,
+  "categoryId": "BURA-ELMI-KATEQORIYASININ-ID-SI"
+}
+
+### 
+
+### 
+
+POST {{Web_HostAddress}}/api/readers
+Content-Type: application/json
+
+{
+  "fullName": "Arif Qasımov",
+  "email": "arif@mail.com"
+}
+
+###
+
+POST {{Web_HostAddress}}/api/readers
+Content-Type: application/json
+
+{
+  "fullName": "Aysel Əliyeva",
+  "email": "aysel@mail.com"
+}
+
+###
+
+###
+
+GET {{Web_HostAddress}}/api/books
+Accept: application/json
+
+###
+
+GET {{Web_HostAddress}}/api/readers
+Accept: application/json
+
+### 
+
+### 
+
+GET {{Web_HostAddress}}/api/books/BURA-KITAB-ID-SI
+Accept: application/json
+
+### 
+### 
+
+PUT {{Web_HostAddress}}/api/books/BURA-KITAB-ID-SI
+Content-Type: application/json
+
+{
+  "title": "Ağ qala",
+  "author": "Orxan Pamuk",
+  "price": 25.00,
+  "categoryId": "BURA-ROMAN-KATEQORIYASININ-ID-SI"
+}
+
+### 
+
+### 
+
+DELETE {{Web_HostAddress}}/api/books/BURA-KITAB-ID-SI
+
+### 
+
+### 
+
+GET {{Web_HostAddress}}/api/books/00000000-0000-0000-0000-000000000000
+Accept: application/json
