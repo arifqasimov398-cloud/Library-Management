@@ -7,7 +7,7 @@ POST {{Web_HostAddress}}/api/categories
 Content-Type: application/json
 
 {
-  "name": "Roman123"
+  "name": "Roman12223"
 }
 
 ###

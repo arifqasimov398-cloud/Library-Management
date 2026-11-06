@@ -53,6 +53,7 @@
             }
             return Ok("al bu da sene GetById");
         }
+        
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
@@ -61,9 +62,10 @@
             {
                 return NotFound();
             }
-            context.Delete(id);
+            context.Delete(book);   
             return Ok("BU kitab getdi rehmete");
         }
+
         [HttpPut("{id}")]
         public IActionResult Update(Guid id, CreateBookDto dto)
         {
@@ -76,10 +78,9 @@
             book.Price = dto.Price;
             book.CategoryId = dto.CategoryId;
             book.Author = dto.Author;
-            context.Update(id);
+            context.Update(book);   
             return Ok("BU kitabda deyisiklik oldu qedeş");
         }
-        
     }
 }
 

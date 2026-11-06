@@ -22,6 +22,7 @@
             return Created(string.Empty, reader);
         }
 
+        
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
@@ -30,8 +31,8 @@
             {
                 return NotFound();
             }
-            context.Delete(id);
-            return Ok("Sen getdin bloka");
+            context.Delete(reader);   
+            return Ok();
         }
     }
 }
