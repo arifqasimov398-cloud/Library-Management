@@ -1,41 +1,37 @@
-﻿namespace Web.Application.Conturollers
+namespace Web.Application.Conturollers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController(IBookRepository context) : ControllerBase
     {
         [HttpPost]
-        public IActionResult Create(CreateBookDto dto)
+        public IActionResult Create([FromBody] CreateBookDto dto)
         {
-            if(dto==null)
+            if (dto is null || string.IsNullOrWhiteSpace(dto.Title) ||
+                string.IsNullOrWhiteSpace(dto.Author) || dto.Price < 0 ||
+                dto.CategoryId == Guid.Empty)
             {
-                return BadRequest("Melumat yoxdu qaqa ");
-            }
-            var kitablar = context.GetAll();
-            bool olan = false;
-
-            foreach (var b in kitablar)
-            {
-                if (b.Title == dto.Title && b.Author == dto.Author)
-                {
-                    olan = true;
-                }
+                return BadRequest("Kitab məlumatları düzgün daxil edilməyib.");
             }
 
-            if (olan)
+            var exists = context.GetAll().Any(book =>
+                book.Title == dto.Title && book.Author == dto.Author);
+
+            if (exists)
             {
-                return Conflict("Bu kitab artıq var");
+                return Conflict("Bu kitab artıq kataloqda mövcuddur.");
             }
+
             var book = new Book
             {
-                Title = dto.Title,
-                Author = dto.Author,
+                Title = dto.Title.Trim(),
+                Author = dto.Author.Trim(),
                 Price = dto.Price,
                 CategoryId = dto.CategoryId
             };
 
             context.Add(book);
-            return Created( string.Empty, book);
+            return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
         }
 
         [HttpGet]
@@ -43,44 +39,58 @@
         {
             return Ok(context.GetAll());
         }
-        [HttpGet("{id}")]
+
+        [HttpGet("{id:guid}")]
         public IActionResult GetById(Guid id)
         {
             var book = context.GetById(id);
-            if (book == null)
+            return book is null ? NotFound() : Ok(book);
+        }
+
+        [HttpPut("{id:guid}")]
+        public IActionResult Update(Guid id, [FromBody] CreateBookDto dto)
+        {
+            if (dto is null || string.IsNullOrWhiteSpace(dto.Title) ||
+                string.IsNullOrWhiteSpace(dto.Author) || dto.Price < 0 ||
+                dto.CategoryId == Guid.Empty)
+            {
+                return BadRequest("Kitab məlumatları düzgün daxil edilməyib.");
+            }
+
+            var book = context.GetById(id);
+            if (book is null)
             {
                 return NotFound();
             }
-            return Ok("al bu da sene GetById");
+
+            var duplicate = context.GetAll().Any(item =>
+                item.Id != id && item.Title == dto.Title && item.Author == dto.Author);
+
+            if (duplicate)
+            {
+                return Conflict("Eyni adlı kitab bu müəlliflə artıq mövcuddur.");
+            }
+
+            book.Title = dto.Title.Trim();
+            book.Author = dto.Author.Trim();
+            book.Price = dto.Price;
+            book.CategoryId = dto.CategoryId;
+
+            context.Update(book);
+            return Ok(book);
         }
-        
-        [HttpDelete("{id}")]
+
+        [HttpDelete("{id:guid}")]
         public IActionResult Delete(Guid id)
         {
             var book = context.GetById(id);
-            if (book == null)
+            if (book is null)
             {
                 return NotFound();
             }
-            context.Delete(book);   
-            return Ok("BU kitab getdi rehmete");
-        }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(Guid id, CreateBookDto dto)
-        {
-            var book = context.GetById(id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-            book.Title = dto.Title;
-            book.Price = dto.Price;
-            book.CategoryId = dto.CategoryId;
-            book.Author = dto.Author;
-            context.Update(book);   
-            return Ok("BU kitabda deyisiklik oldu qedeş");
+            context.Delete(book);
+            return NoContent();
         }
     }
 }
-
