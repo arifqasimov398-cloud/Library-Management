@@ -58,7 +58,7 @@ function renderBooks() {
   const term = ($("#bookSearch")?.value || "").toLocaleLowerCase("az");
   const filter = $("#categoryFilter")?.value || "";
   const books = state.books.filter(b => `${b.title} ${b.author}`.toLocaleLowerCase("az").includes(term) && (!filter || b.categoryId === filter));
-  $("#booksTable").innerHTML = books.length ? books.map(b => `<tr><td>${bookCell(b)}</td><td>${safe(b.author)}</td><td><span class="tag">${safe(categoryName(b.categoryId))}</span></td><td class="price">${money(b.price)}</td><td><div class="row-actions"><button class="small-action delete" data-delete-book="${safe(b.id)}">Sil</button></div></td></tr>`).join("") : '<tr><td colspan="5" class="empty-cell">Axtarışa uyğun kitab tapılmadı.</td></tr>';
+  $("#booksTable").innerHTML = books.length ? books.map(b => `<tr><td>${bookCell(b)}</td><td>${safe(b.author)}</td><td><span class="tag">${safe(categoryName(b.categoryId))}</span></td><td class="price">${money(b.price)}</td><td><div class="row-actions"><button class="small-action" data-edit-book="${safe(b.id)}">Redaktə</button><button class="small-action delete" data-delete-book="${safe(b.id)}">Sil</button></div></td></tr>`).join("") : '<tr><td colspan="5" class="empty-cell">Axtarışa uyğun kitab tapılmadı.</td></tr>';
   $("#booksFooter").textContent = `Cəmi ${books.length} kitab göstərilir`;
 }
 function renderReaders() {
@@ -81,13 +81,14 @@ function navigate(view) {
   $("#breadcrumbTitle").textContent = ({dashboard:"İdarə paneli",books:"Kitablar",readers:"Oxucular",categories:"Kateqoriyalar"})[view];
   $("#sidebar").classList.remove("open");
 }
-function openModal(title, fields) {
+function openModal(title, fields, values = {}) {
   $("#modalTitle").textContent = title;
   $("#modalFields").innerHTML = fields.map(f => `<div class="field"><label for="field-${f.name}">${f.label}</label>${f.type === "select" ? `<select id="field-${f.name}" name="${f.name}" ${f.required ? "required" : ""}>${f.options}</select>` : `<input id="field-${f.name}" name="${f.name}" type="${f.type || "text"}" placeholder="${f.placeholder || ""}" ${f.required ? "required" : ""} ${f.step ? `step="${f.step}"` : ""} ${f.min !== undefined ? `min="${f.min}"` : ""}>`}</div>`).join("");
+  Object.entries(values).forEach(([name, value]) => { const field = $("#modalFields [name=\\"" + name + "\\"]"); if (field) field.value = value ?? ""; });
   $("#modalBackdrop").classList.add("open"); $("#modalBackdrop").setAttribute("aria-hidden","false");
   setTimeout(() => $("#modalFields input, #modalFields select")?.focus(), 50);
 }
-function closeModal() { $("#modalBackdrop").classList.remove("open"); $("#modalBackdrop").setAttribute("aria-hidden","true"); $("#entityForm").dataset.type = ""; }
+function closeModal() { $("#modalBackdrop").classList.remove("open"); $("#modalBackdrop").setAttribute("aria-hidden","true"); $("#entityForm").dataset.type = ""; delete $("#entityForm").dataset.id; }
 function categoryOptions() { return state.categories.map(c => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join(""); }
 function startAddBook() {
   if (!state.categories.length) { toast("Əvvəlcə ən azı bir kateqoriya yaradın.", true); navigate("categories"); return; }
@@ -98,6 +99,19 @@ function startAddBook() {
     {name:"price",label:"Qiymət (AZN)",type:"number",step:"0.01",min:"0",placeholder:"0.00",required:true},
     {name:"categoryId",label:"Kateqoriya",type:"select",required:true,options:categoryOptions()}
   ]);
+}
+function startEditBook(id) {
+  const book = state.books.find(item => item.id === id);
+  if (!book) return;
+  if (!state.categories.length) { toast("Əvvəlcə kitab kateqoriyalarını yaradın.", true); return; }
+  $("#entityForm").dataset.type = "book-edit";
+  $("#entityForm").dataset.id = id;
+  openModal("Kitabı redaktə et", [
+    {name:"title",label:"Kitabın adı",required:true},
+    {name:"author",label:"Müəllif",required:true},
+    {name:"price",label:"Qiymət (AZN)",type:"number",step:"0.01",min:"0",required:true},
+    {name:"categoryId",label:"Kateqoriya",type:"select",required:true,options:categoryOptions()}
+  ], { title: book.title, author: book.author, price: book.price, categoryId: book.categoryId });
 }
 function startAddReader() {
   $("#entityForm").dataset.type = "reader";
@@ -115,7 +129,11 @@ $("#entityForm").addEventListener("submit", async (event) => {
   const type = event.currentTarget.dataset.type; const data = Object.fromEntries(new FormData(event.currentTarget));
   const save = $("#saveModal"); save.disabled = true; save.textContent = "Yadda saxlanılır...";
   try {
-    if (type === "book") { data.price = Number(data.price); await request("/books",{method:"POST",body:JSON.stringify(data)}); }
+    if (type === "book" || type === "book-edit") {
+      data.price = Number(data.price);
+      const editing = type === "book-edit";
+      await request(editing ? "/books/" + encodeURIComponent(event.currentTarget.dataset.id) : "/books", { method: editing ? "PUT" : "POST", body: JSON.stringify(data) });
+    }
     if (type === "reader") await request("/readers",{method:"POST",body:JSON.stringify(data)});
     if (type === "category") await request("/categories",{method:"POST",body:JSON.stringify(data)});
     closeModal(); toast("Məlumat uğurla əlavə edildi."); await loadData();
@@ -125,6 +143,8 @@ $("#entityForm").addEventListener("submit", async (event) => {
 document.addEventListener("click", async (event) => {
   const nav = event.target.closest("[data-view]"); if (nav) navigate(nav.dataset.view);
   const go = event.target.closest("[data-go]"); if (go) navigate(go.dataset.go);
+  const editBook = event.target.closest("[data-edit-book]");
+  if (editBook) startEditBook(editBook.dataset.editBook);
   const delBook = event.target.closest("[data-delete-book]"); const delReader = event.target.closest("[data-delete-reader]");
   if (delBook && confirm("Bu kitabı silmək istədiyinizə əminsiniz?")) { try { await request("/books/"+encodeURIComponent(delBook.dataset.deleteBook),{method:"DELETE"}); toast("Kitab silindi."); await loadData(); } catch(e){toast(e.message,true);} }
   if (delReader && confirm("Bu oxucunu silmək istədiyinizə əminsiniz?")) { try { await request("/readers/"+encodeURIComponent(delReader.dataset.deleteReader),{method:"DELETE"}); toast("Oxucu silindi."); await loadData(); } catch(e){toast(e.message,true);} }
