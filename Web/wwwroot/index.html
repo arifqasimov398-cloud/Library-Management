@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101b2d">
+  <meta name="description" content="LibraryOS - kitabxana idarəetmə paneli">
+  <title>LibraryOS — İdarəetmə paneli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">L</span><span>Library<span class="brand-light">OS</span><small>MANAGEMENT SYSTEM</small></span></a>
+      <div class="side-label">ƏSAS MENYU</div>
+      <nav class="navigation">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">▦</span> İdarə paneli</button>
+        <button class="nav-item" data-view="books"><span class="nav-icon">▤</span> Kitablar <span class="nav-count" id="bookNavCount">0</span></button>
+        <button class="nav-item" data-view="readers"><span class="nav-icon">♙</span> Oxucular</button>
+        <button class="nav-item" data-view="categories"><span class="nav-icon">▧</span> Kateqoriyalar</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><div class="help-icon">✦</div><strong>Kitabxananı idarə et</strong><p>Kitab və oxucu məlumatlarını bir mərkəzdən izləyin.</p></div>
+        <div class="profile"><div class="avatar">A</div><div><strong>Administrator</strong><small>Kitabxana meneceri</small></div><span class="profile-dots">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Menyunu aç">☰</button>
+        <div class="breadcrumbs">LibraryOS <span>/</span> <strong id="breadcrumbTitle">İdarə paneli</strong></div>
+        <div class="top-actions"><span class="connection"><i></i><span id="connectionText">Server yoxlanılır</span></span><div class="top-avatar">A</div></div>
+      </header>
+
+      <section class="page active" id="dashboardView">
+        <div class="page-heading"><div><div class="eyebrow">ÜMUMİ BAXIŞ</div><h1>İdarə paneli</h1><p>Kitabxananızda baş verənləri bir baxışda izləyin.</p></div><button class="btn btn-primary" id="quickAddBook">＋ Yeni kitab əlavə et</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Ümumi kitablar</span><span class="stat-icon blue">▤</span></div><div class="stat-value" id="totalBooks">—</div><div class="stat-foot">Kitab kataloqunda</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Oxucular</span><span class="stat-icon violet">♙</span></div><div class="stat-value" id="totalReaders">—</div><div class="stat-foot">Qeydiyyatdan keçmiş oxucu</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Kateqoriyalar</span><span class="stat-icon amber">▧</span></div><div class="stat-value" id="totalCategories">—</div><div class="stat-foot">Kitab bölmələri</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Kataloq dəyəri</span><span class="stat-icon green">₼</span></div><div class="stat-value" id="catalogValue">—</div><div class="stat-foot">Kitabların ümumi qiyməti</div></article>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel recent-panel"><div class="panel-heading"><div><h2>Son əlavə olunan kitablar</h2><p>Kataloqa daxil edilmiş kitablar</p></div><button class="text-button" data-go="books">Hamısına bax →</button></div><div class="table-wrap"><table><thead><tr><th>KİTAB</th><th>MÜƏLLİF</th><th>KATEQORİYA</th><th>QİYMƏT</th></tr></thead><tbody id="recentBooks"><tr><td colspan="4" class="empty-cell">Məlumat yüklənir...</td></tr></tbody></table></div></section>
+          <section class="panel category-panel"><div class="panel-heading"><div><h2>Kateqoriyalar</h2><p>Kitabxana bölmələri</p></div><button class="icon-button" data-go="categories" aria-label="Kateqoriyalara bax">↗</button></div><div id="categoryOverview" class="category-list"><div class="empty-state">Məlumat yüklənir...</div></div></section>
+        </div>
+        <div class="api-note" id="apiNote"><span>ⓘ</span> Məlumatlar ASP.NET Core API vasitəsilə yüklənir. Serverə qoşulma vəziyyəti yuxarıda göstərilir.</div>
+      </section>
+
+      <section class="page" id="booksView">
+        <div class="page-heading"><div><div class="eyebrow">KATALOQ</div><h1>Kitablar</h1><p>Kitab fondunu yaradın, axtarın və idarə edin.</p></div><button class="btn btn-primary" id="addBookBtn">＋ Yeni kitab</button></div>
+        <section class="panel"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="bookSearch" type="search" placeholder="Kitab adı və ya müəllif üzrə axtar..."></div><select id="categoryFilter" class="filter-select"><option value="">Bütün kateqoriyalar</option></select></div><div class="table-wrap"><table><thead><tr><th>KİTABIN ADI</th><th>MÜƏLLİF</th><th>KATEQORİYA</th><th>QİYMƏT</th><th class="align-right">ƏMƏLİYYAT</th></tr></thead><tbody id="booksTable"><tr><td colspan="5" class="empty-cell">Məlumat yüklənir...</td></tr></tbody></table></div><div class="table-footer" id="booksFooter"></div></section>
+      </section>
+
+      <section class="page" id="readersView">
+        <div class="page-heading"><div><div class="eyebrow">İSTİFADƏÇİLƏR</div><h1>Oxucular</h1><p>Kitabxana oxucularının qeydiyyat məlumatları.</p></div><button class="btn btn-primary" id="addReaderBtn">＋ Yeni oxucu</button></div>
+        <section class="panel"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="readerSearch" type="search" placeholder="Ad və ya e-poçt üzrə axtar..."></div></div><div class="table-wrap"><table><thead><tr><th>OXUCU</th><th>E-POÇT</th><th>QEYDİYYAT ID</th><th class="align-right">ƏMƏLİYYAT</th></tr></thead><tbody id="readersTable"><tr><td colspan="4" class="empty-cell">Məlumat yüklənir...</td></tr></tbody></table></div></section>
+      </section>
+
+      <section class="page" id="categoriesView">
+        <div class="page-heading"><div><div class="eyebrow">TƏSNİFAT</div><h1>Kateqoriyalar</h1><p>Kitabları mövzularına görə qruplaşdırın.</p></div><button class="btn btn-primary" id="addCategoryBtn">＋ Yeni kateqoriya</button></div>
+        <div class="category-grid" id="categoriesGrid"><div class="panel empty-state">Məlumat yüklənir...</div></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-heading"><div><div class="eyebrow">MƏLUMATLAR</div><h2 id="modalTitle">Yeni qeyd</h2></div><button class="icon-button" id="closeModal" aria-label="Bağla">✕</button></div><form id="entityForm"><div id="modalFields"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" id="cancelModal">Ləğv et</button><button type="submit" class="btn btn-primary" id="saveModal">Yadda saxla</button></div></form></section></div>
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  <script src="/js/app.js" defer></script>
+</body>
+</html>
